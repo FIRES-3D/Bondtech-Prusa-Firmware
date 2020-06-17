@@ -56,10 +56,12 @@ uint8_t tmc2130_home_fsteps[2] = {48, 48};
 
 uint8_t tmc2130_wave_fac[4] = {0, 0, 0, 0};
 
+// {TOFF, HSTRT, HEND, TBL, CHM} // Not positive about last two...
+// {ChopperDecayTime(1-15), HysteresisStart(0-7), HysteresisEnd(0-15), ComparatorBlankTime(0-3), ChopperMode(0/1 SpreadCycle/Classic}
 tmc2130_chopper_config_t tmc2130_chopper_config[4] = {
-	{TMC2130_TOFF_XYZ, 5, 1, 2, 0},
-	{TMC2130_TOFF_XYZ, 5, 1, 2, 0},
-	{TMC2130_TOFF_XYZ, 5, 1, 2, 0},
+	{TMC2130_TOFF_X, 3, 1, 2, 0},
+	{TMC2130_TOFF_Y, 3, 1, 2, 0},
+	{TMC2130_TOFF_Z, 5, 1, 2, 0},
 	{TMC2130_TOFF_E, 5, 1, 2, 0}
 };
 
@@ -428,6 +430,7 @@ void tmc2130_check_overtemp()
 void tmc2130_setup_chopper(uint8_t axis, uint8_t mres, uint8_t current_h, uint8_t current_r)
 {
 	uint8_t intpol = (mres != 0); // intpol to 256 only if microsteps aren't 256
+//uint8_t intpol = 0; // Uncomment to disable 256x microstepping interpolation																			   
 	uint8_t toff = tmc2130_chopper_config[axis].toff; // toff = 3 (fchop = 27.778kHz)
 	uint8_t hstrt = tmc2130_chopper_config[axis].hstr; //initial 4, modified to 5
 	uint8_t hend = tmc2130_chopper_config[axis].hend; //original value = 1
@@ -563,7 +566,7 @@ void tmc2130_wr_CHOPCONF(uint8_t axis, uint8_t toff, uint8_t hstrt, uint8_t hend
 	val |= (uint32_t)(rndtf & 1) << 13;
 	val |= (uint32_t)(chm & 1) << 14;
 	val |= (uint32_t)(tbl & 3) << 15;
-	val |= (uint32_t)(vsense & 1) << 17;
+	val |= (uint32_t)(vsense & 1) << 17;  // Enable/Disable vsense
 	val |= (uint32_t)(vhighfs & 1) << 18;
 	val |= (uint32_t)(vhighchm & 1) << 19;
 	val |= (uint32_t)(sync & 15) << 20;
