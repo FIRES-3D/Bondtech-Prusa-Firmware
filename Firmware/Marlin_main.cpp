@@ -792,7 +792,7 @@ int uart_putchar(char c, FILE *)
 void lcd_splash()
 {
 	lcd_clear(); // clears display and homes screen
-	lcd_puts_P(PSTR("\n Original Prusa i3\n   Prusa Research"));
+	lcd_puts_P(PSTR("\n FIRES DESIGN \n i3 MK3F-M-BT"));
 }
 
 
@@ -2186,7 +2186,7 @@ bool calibrate_z_auto()
 	plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate / 60, active_extruder);
 	st_synchronize();
 	enable_endstops(endstops_enabled);
-	if (PRINTER_TYPE == PRINTER_MK3) {
+  if ((PRINTER_TYPE == PRINTER_MK3S) || (PRINTER_TYPE == PRINTER_MK3) || (PRINTER_TYPE == PRINTER_MK25S)) {
 		current_position[Z_AXIS] = Z_MAX_POS + 2.0;
 	}
 	else {
@@ -2246,12 +2246,14 @@ void homeaxis(int axis, uint8_t cnt)
         enable_endstops(false);
         current_position[axis] = 0;
         plan_set_position(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS]);
-        destination[axis] = 1. * axis_home_dir;
+        //destination[axis] = 1. * axis_home_dir;
+		destination[axis] = 1.5 * axis_home_dir; // Move away from end stop slightly farther
         plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
         st_synchronize();
         // Now continue to move up to the left end stop with the collision detection enabled.
         enable_endstops(true);
-        destination[axis] = 1.1 * axis_home_dir * max_length(axis);
+        //destination[axis] = 1.1 * axis_home_dir * max_length(axis);
+        destination[axis] = 1.6 * axis_home_dir * max_length(axis);
         plan_buffer_line(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], destination[E_AXIS], feedrate/60, active_extruder);
         st_synchronize();
 		for (uint8_t i = 0; i < cnt; i++)
